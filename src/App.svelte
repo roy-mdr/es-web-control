@@ -280,6 +280,7 @@
 					{device}
 					{lastEvent}
 					{controllersAvailable}
+					{connId}
 					on:sendAction={sendAction}
 					on:lastEventReceived={lastEventReceived}
 				/>

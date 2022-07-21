@@ -76,7 +76,7 @@
 
 
 <Modal title={device.name} on:exitModal={closeDevice}>
-  {#each device.actions as action}
+  {#each device.actions as action, actIx}
     <div class:unavailable={ action.available === false }>
         {#if action.details !== undefined}
             {#each Object.entries(action.details) as [det_key, det_val], detIndex (det_key) }
@@ -92,7 +92,9 @@
         {/if}
         <button type="button" class="btn_grey" on:click={() => { sendAction(action); }}>{action.desc}</button>
     </div>
-    <hr>
+    {#if actIx < device.actions.length-1}
+      <hr>
+    {/if}
   {/each}
 </Modal>
 

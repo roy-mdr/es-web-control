@@ -8,12 +8,13 @@
 	export let device = {};
 	export let lastEvent;
 	export let controllersAvailable; // = []
+	export let connId;
 
 
 	/* life cycle */
-	onMount(() => {
+	/* onMount(() => {
 		getLedState();
-	});
+	}); */
 
 
 	/* emitters */
@@ -57,7 +58,6 @@
 				if (disableDevice) {
 					deviceStatus = -2;
 				} else if (deviceStatus == -2) {
-					console.log("ok go!!!!!!!!!!!!!!!!!")
 					getLedState();
 				}
 			}
@@ -66,6 +66,11 @@
 		
 	}
 	$: updateControllersStatus(controllersAvailable);
+
+	function onNewConnection(connId) {
+		getLedState();
+	}
+	$: onNewConnection(connId);
 
 	/* data */
 
