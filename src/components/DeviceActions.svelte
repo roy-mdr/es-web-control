@@ -1,14 +1,20 @@
 <script>
 
 	/* imports */
-	import { createEventDispatcher } from 'svelte';
+	import { onDestroy, createEventDispatcher } from 'svelte';
   import Modal from './Modal.svelte';
+	import { lastEvent } from '../stores/eventStore.js';
 
 
 	/* props */
 	export let device; // = {}
-  export let lastEvent;
 	export let controllersAvailable; // = []
+
+
+  /* life cycle */
+  onDestroy(() => {
+    lastEventUnsubscribe();
+  });
 
 
 	/* emitters */
@@ -21,10 +27,6 @@
 
 	function sendAction(action) {
 		dispatch('sendAction', {device_id: device._id, action: action});
-	}
-
-	function lastEventReceived() {
-		dispatch('lastEventReceived');
 	}
 
 
@@ -42,29 +44,29 @@
 	}
 
 
+  /* stores */
+
+  const lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
+    if ( typeof lstEv == 'object' ) {
+      if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
+
+        lastEvent.reset();
+
+        responses.push(lstEv);
+        responses = responses;
+        console.log("RESPONSES gotEvent:", responses);
+      }
+    }
+  });
+
+
 	/* watchers */
 	$: updateControllersStatus(controllersAvailable);
-
-  function checkEventTopic(lstEv) {
-		if ( typeof lstEv == 'object' ) {
-			if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
-				gotEvent(lstEv);
-			}
-		}
-	}
-	$: checkEventTopic(lastEvent);
 
 
   /* data */
 
 	let responses = [];
-
-  function gotEvent(ev) {
-    responses.push(ev);
-    responses = responses;
-    lastEventReceived();
-    console.log("RESPONSES gotEvent:", responses);
-  }
 
   function removeResponse(resIndex) {
     responses.splice(resIndex, 1);

@@ -1,12 +1,12 @@
 <script>
 
 	/* imports */
-	import { onMount, createEventDispatcher } from 'svelte';
+	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+	import { lastEvent } from '../stores/eventStore.js';
 
 
 	/* props */
 	export let device = {};
-	export let lastEvent;
 	export let controllersAvailable; // = []
 	export let connId;
 
@@ -15,6 +15,10 @@
 	/* onMount(() => {
 		getLedState();
 	}); */
+
+	onDestroy(() => {
+		lastEventUnsubscribe();
+	});
 
 
 	/* emitters */
@@ -28,22 +32,29 @@
 			}
 		});
 	}
-	
-	function lastEventReceived() {
-		dispatch('lastEventReceived');
-	}
+
+
+	/* stores */
+
+	const lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
+		if ( typeof lstEv == 'object' ) {
+			if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
+
+				lastEvent.reset();
+
+				if (lstEv.e.detail == 1) {
+					deviceStatus = 1;
+				}
+
+				if (lstEv.e.detail == 0) {
+					deviceStatus = 0;
+				}
+			}
+		}
+	});
 
 
 	/* watchers */
-
-	function checkEventTopic(lstEv) {
-		if ( typeof lstEv == 'object' ) {
-			if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
-				gotEvent(lstEv);
-			}
-		}
-	}
-	$: checkEventTopic(lastEvent);
 
 	function updateControllersStatus(controllers) {
 		let disableDevice = true;
@@ -75,19 +86,6 @@
 	/* data */
 
 	let deviceStatus = -2;
-
-	function gotEvent(ev) {
-			
-		if (ev.e.detail == 1) {
-			deviceStatus = 1;
-		}
-
-		if (ev.e.detail == 0) {
-			deviceStatus = 0;
-		}
-
-		lastEventReceived();
-	}
 
 	function getLedState() {
 		sendAction('get_state');

@@ -1,13 +1,13 @@
 <script>
 
 	/* imports */
-	import { onMount, createEventDispatcher } from 'svelte';
+	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+	import { lastEvent } from '../stores/eventStore.js';
 
 
 
 	/* props */
 	export let device = {};
-	export let lastEvent;
 
 
 
@@ -16,28 +16,25 @@
 		getLastTmpHum();
 		updateTimeAgo();
 	});
+
+	onDestroy(() => {
+		lastEventUnsubscribe();
+	});
+
 	
 
+	/* stores */
 
-	/* emitters */
-	const dispatch = createEventDispatcher();
-	
-	function lastEventReceived() {
-		dispatch('lastEventReceived');
-	}
-
-
-
-	/* watchers */
-
-	function checkEventTopic(lstEv) {
+	const lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
 		if ( typeof lstEv == 'object' ) {
 			if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
-				gotEvent(lstEv);
+
+				lastEvent.reset();
+
+				readDHTData(lstEv.e.detail);
 			}
 		}
-	}
-	$: checkEventTopic(lastEvent);
+	});
 
 
 
@@ -58,11 +55,6 @@
 		lux_snap: null,
 		date: null
 	};
-
-	function gotEvent(ev) {
-		readDHTData(ev.e.detail);
-		lastEventReceived();
-	}
 
 	function readDHTData(data) {
 		if (data.error) {

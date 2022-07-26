@@ -8,6 +8,7 @@
 	import DeviceTmpHum from './components/DeviceTmpHum.svelte';
 	import dummyData from './dummyData.js';
 	import NPS from './libs/NoPollSubscriber.js';
+	import { lastEvent } from './stores/eventStore.js';
 
 
 
@@ -29,12 +30,11 @@
 	let controllersAvailable = [];
 	let deviceExpanded = null;
 	let eventPoints = [];
-	let lastEvent;
 	
 	function fetchData() {
 
 		// DEV:
-		 /*
+		/*
 		
 		devices = dummyData;
 
@@ -56,7 +56,7 @@
 					eventPoints = eventPoints;
 					
 					return;
-		 */
+		*/
 
 		// ----------------------------------------------------------
 
@@ -185,7 +185,7 @@
 			}
 
 		} else {
-			lastEvent = event;
+			lastEvent.set(event);
 		}
 	}
 
@@ -215,10 +215,6 @@
 			evQuee.shift();
 			sendAction(ev);
 		})
-	}
-
-	function lastEventReceived() {
-		lastEvent = undefined;
 	}
 
 	function getSubUrl() {
@@ -278,11 +274,9 @@
 			{#if device.type == "led"}
 				<DeviceLed
 					{device}
-					{lastEvent}
 					{controllersAvailable}
 					{connId}
 					on:sendAction={sendAction}
-					on:lastEventReceived={lastEventReceived}
 				/>
 			{/if}
 					
@@ -297,8 +291,6 @@
 			{#if device.type == "tmphum"}
 				<DeviceTmpHum
 					{device}
-					{lastEvent}
-					on:lastEventReceived={lastEventReceived}
 				/>
 			{/if}
 
@@ -315,11 +307,9 @@
 {#if deviceExpanded !== null}
 	<DeviceActions
 		device={deviceExpanded}
-		{lastEvent}
 		{controllersAvailable}
 		on:device-close={(ev) => { deviceExpanded = null }}
 		on:sendAction={sendAction}
-		on:lastEventReceived={lastEventReceived}
 	/>
 {/if}
 
