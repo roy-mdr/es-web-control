@@ -120,6 +120,41 @@
 	/* Pub Sub Subscription */
 
 	let connId;
+	let connSecret;
+	let connTimeout;
+	let aliveLoop;
+
+	function begginAliveLoop() {
+
+		clearTimeout(aliveLoop);
+
+		aliveLoop = setTimeout(function() {
+
+			if (!connectedToBroker) {
+				clearTimeout(aliveLoop);
+				return;
+			}
+
+			const refreshURL = `${getSubUrl()}alive`;
+
+			fetch(refreshURL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({connid: connId, secret: connSecret})
+			})
+				.then(response => response.json())
+				.then(data => {
+					connId      = data.connid;
+					connSecret  = data.secret;
+					connTimeout = data.timeout;
+				});
+
+			begginAliveLoop();
+
+		}, connTimeout - 3000); // timeout - 3 seconds
+	}
 
 	let mayStart = false;
 
@@ -166,6 +201,9 @@
 
 		if ( event.ep.emitted == '@SERVER@' ) {
 			connId = event.e.detail.connid;
+			connSecret = event.e.detail.secret;
+			connTimeout = event.e.detail.timeout;
+			begginAliveLoop();
 		} else if ( /^@CONNECTION@\/[^\/]+$/.test(event.ep.emitted) ) {
 
 			const controllerClid = event.ep.emitted.split('/')[1];
