@@ -258,16 +258,18 @@
 	function getSubUrl() {
 		if ( /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(window.location.host) ) {
 			let port = 0;
+			let hostNoPort = window.location.host.split(':')[0];
 			if ( window.location.protocol == "http:" ) { port = /*1010*/ 1011; }
 			if ( window.location.protocol == "https:" ) { port = 1011; }
-			return `${window.location.protocol}//${window.location.host}:${port}/`;
+			return `${window.location.protocol}//${hostNoPort}:${port}/`;
 
 		} else if ( /^localhost/.test(window.location.host) ) {
 			let port = 0;
+			let hostNoPort = window.location.host.split(':')[0];
 			if ( window.location.protocol == "http:" ) { port = 1010 /*1011*/; }
 			if ( window.location.protocol == "https:" ) { port = 1011; }
-			return `https://notify.estudiosustenta.myds.me/`;
-			// return `${window.location.protocol}//${window.location.host}:${port}/`;
+			// return `https://notify.estudiosustenta.myds.me/`;
+			return `${window.location.protocol}//${hostNoPort}:${port}/`;
 			
 		} else {
 			return `${window.location.protocol}//notify.${window.location.host}/`;
