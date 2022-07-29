@@ -149,7 +149,11 @@
 					connId      = data.connid;
 					connSecret  = data.secret;
 					connTimeout = data.timeout;
-				});
+				})
+				.catch(error => {
+					console.error('Error on Alive request:', error);
+					clearTimeout(aliveLoop);
+				})
 
 			begginAliveLoop();
 
