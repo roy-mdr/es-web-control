@@ -3,6 +3,7 @@
     /* imports */
     import { onMount, createEventDispatcher } from 'svelte';
     import Modal from './Modal.svelte';
+    import ControllerFound from './ControllerFound.svelte';
 
 
     /* life cycle */
@@ -25,7 +26,6 @@
 
 
     function findControllers() {
-        console.log("fetching")
         fetch(`/controll/get_controllers.php`)
             .then( (res) => res.json() )
             .then( (data) => {
@@ -56,8 +56,7 @@
     {:then controlers}
         {#if controlers.length > 0}
             {#each controlers as controller}
-                <a href={`http://${controller.ipv4_interface}/`} target="_blank">{controller._id}</a>
-                <br>
+                <ControllerFound {controller}/>
             {/each}
         {:else}
             <div class="flex-center">
