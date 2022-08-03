@@ -146,7 +146,10 @@
 				<img src="./img/humidity.svg" alt="humidity" class="stat_img">
 				<span>{`${tmpHumData.hum}%`}</span>
 			</div>
-			<span>{`HIC: ${tmpHumData.hic}ºC`}</span>
+			<div class="iconAndData">
+				<img src="./img/person.svg" alt="heat index" class="stat_img">
+				<span>{`${tmpHumData.hic}%`}</span>
+			</div>
 			<span style="font-size: smaller; color: #999;">{timeAgo}</span>
 			{/if}
 			
