@@ -2,6 +2,29 @@
 
 	/* imports */
 	import { createEventDispatcher } from 'svelte';
+  import { circOut, circIn, circInOut } from 'svelte/easing';
+
+  /* animation */
+  let fadedClass = true;
+
+  function intro(node, { mode, init, duration }) {
+    return {
+      duration,
+      css: t => {
+        let eased;
+
+        if (mode.toLowerCase() == 'in') {
+            eased = circOut(t);
+        } else if (mode.toLowerCase() == 'out') {
+            eased = circIn(t);
+        } else {
+            eased = circInOut(t);
+        }
+
+        return `transform: scale(${init+(eased*(1-init))}); opacity: ${eased};`
+      }
+    };
+  }
 
 
 	/* props */
