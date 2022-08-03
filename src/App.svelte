@@ -6,6 +6,7 @@
 	import DeviceLed from './components/DeviceLed.svelte';
 	import DevicePC from './components/DevicePC.svelte';
 	import DeviceTmpHum from './components/DeviceTmpHum.svelte';
+	import FindControllers from './components/FindControllers.svelte';
 	import dummyData from './dummyData.js';
 	import NPS from './libs/NoPollSubscriber.js';
 	import { lastEvent } from './stores/eventStore.js';
@@ -30,6 +31,7 @@
 	let controllersAvailable = [];
 	let deviceExpanded = null;
 	let eventPoints = [];
+	let openFindCtrl = false;
 	
 	function fetchData() {
 
@@ -283,32 +285,37 @@
 </script>
 
 <div id="statBar">
-	<div id="notifStatus" style="width: 10px; height: 10px; border-radius: 5px; margin-right: 1em;"
-	class:wifioff={notifBrokerState == -1}
-	class:disconnected={notifBrokerState == 0}
-	class:waiting={notifBrokerState == 1}
-	class:connected={notifBrokerState == 2}
-	></div>
+	<div style="display: flex; align-items: center; justify-content: center;">
+		<div id="notifStatus" style="width: 10px; height: 10px; border-radius: 5px; margin-right: 1em;"
+		class:wifioff={notifBrokerState == -1}
+		class:disconnected={notifBrokerState == 0}
+		class:waiting={notifBrokerState == 1}
+		class:connected={notifBrokerState == 2}
+		></div>
 
-	{#if notifBrokerState === undefined}
-	...
-	{/if}
+		{#if notifBrokerState === undefined}
+		...
+		{/if}
 
-	{#if notifBrokerState === -1}
-	WiFi Off
-	{/if}
+		{#if notifBrokerState === -1}
+		WiFi Off
+		{/if}
 
-	{#if notifBrokerState === 0}
-	Disconnected
-	{/if}
+		{#if notifBrokerState === 0}
+		Disconnected
+		{/if}
 
-	{#if notifBrokerState === 1}
-	Waiting...
-	{/if}
+		{#if notifBrokerState === 1}
+		Waiting...
+		{/if}
 
-	{#if notifBrokerState === 2}
-	Connected
-	{/if}
+		{#if notifBrokerState === 2}
+		Connected
+		{/if}
+	</div>
+
+
+	<button on:click={() => openFindCtrl = true}>Find controllers</button>
 </div>
 
 <div id="deviceContainer">
@@ -357,6 +364,10 @@
 	/>
 {/if}
 
+{#if openFindCtrl}
+	<FindControllers on:close={() => openFindCtrl = false}/>
+{/if}
+
 <style>
 	/* main {
 		text-align: center;
@@ -389,11 +400,28 @@
 	#statBar {
 		display: flex;
 		background-color: white;
-		width: 100%;
 		z-index: 100;
 		box-shadow: 0px 1px 1px 0 rgba(0, 0, 0, 0.1);
 		padding: 1em;
 		align-items: center;
+		justify-content: space-between;
+	}
+
+	#statBar button {
+		background-color: white;
+		border: 1px solid lightblue;
+		color: lightblue;
+		border-radius: 5px;
+		padding-top: 0.5em;
+		padding-bottom: 0.5em;
+		padding-left: 1em;
+		padding-right: 1em;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	#statBar button:hover {
+		box-shadow: 0px 5px 10px 0 rgba(0, 0, 0, 0.1);
 	}
 
 	#notifStatus {

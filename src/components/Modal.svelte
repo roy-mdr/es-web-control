@@ -156,7 +156,9 @@ body {
   padding: 1em 2em;
   pointer-events: all;
   position: relative;
-  width: min-content;
+  /* width: min-content; */
+  width: fit-content;
+  max-width: 70%;
 }
 .modal .modal-title h1 {
   font-size: 1.25rem;
