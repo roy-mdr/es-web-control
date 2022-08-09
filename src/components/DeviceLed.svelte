@@ -79,7 +79,9 @@
 	$: updateControllersStatus(controllersAvailable);
 
 	function onNewConnection(connId) {
-		getLedState();
+		if (deviceStatus != -2) {
+			getLedState();
+		}
 	}
 	$: onNewConnection(connId);
 
@@ -107,10 +109,10 @@
 	<div class="device_led square" class:active={deviceStatus >= 0} class:inactive={deviceStatus < 0}>
 
 		<div class="icon center noselect">
-			<img src="./img/bulb_on.svg"   alt="PC on"           class="stat_img" class:hidden={deviceStatus !=  1}>
-			<img src="./img/bulb_off.svg"  alt="PC off"          class="stat_img" class:hidden={deviceStatus !=  0}>
-			<img src="./img/loading.svg"   alt="PC waiting"      class="stat_img" class:hidden={deviceStatus != -1}>
-			<img src="./img/bulb_disc.svg" alt="PC disconnected" class="stat_img" class:hidden={deviceStatus != -2}>
+			<img src="./img/bulb_on.svg"   alt="Led on"           class="stat_img" class:hidden={deviceStatus !=  1}>
+			<img src="./img/bulb_off.svg"  alt="Led off"          class="stat_img" class:hidden={deviceStatus !=  0}>
+			<img src="./img/loading.svg"   alt="Led waiting"      class="stat_img" class:hidden={deviceStatus != -1}>
+			<img src="./img/bulb_disc.svg" alt="Led disconnected" class="stat_img" class:hidden={deviceStatus != -2}>
 			<span class="title">{device.name}</span>
 		</div>
 
