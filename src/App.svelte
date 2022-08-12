@@ -5,6 +5,7 @@
 	import DeviceActions from './components/DeviceActions.svelte';
 	import DeviceLed from './components/DeviceLed.svelte';
 	import DevicePC from './components/DevicePC.svelte';
+	import DeviceTinaco from './components/DeviceTinaco.svelte';
 	import DeviceTmpHum from './components/DeviceTmpHum.svelte';
 	import FindControllers from './components/FindControllers.svelte';
 	import dummyData from './dummyData.js';
@@ -330,7 +331,7 @@
 					on:sendAction={sendAction}
 				/>
 			{/if}
-					
+
 			{#if device.type == "pc"}
 				<DevicePC
 					{device}
@@ -338,10 +339,19 @@
 					on:device-expanded={(ev) => { deviceExpanded = ev.detail.device }}
 				/>
 			{/if}
-					
+
 			{#if device.type == "tmphum"}
 				<DeviceTmpHum
 					{device}
+				/>
+			{/if}
+
+			{#if device.type == "tinaco"}
+				<DeviceTinaco
+					{device}
+					{controllersAvailable}
+					{connId}
+					on:sendAction={sendAction}
 				/>
 			{/if}
 
