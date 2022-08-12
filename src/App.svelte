@@ -316,7 +316,7 @@
 	</div>
 
 
-	<button on:click={() => openFindCtrl = true}>Find controllers</button>
+	<button on:click={() => openFindCtrl = true}>Discovery</button>
 </div>
 
 <div id="deviceContainer">

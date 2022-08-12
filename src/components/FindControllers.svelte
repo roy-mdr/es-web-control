@@ -60,7 +60,7 @@
             {/each}
         {:else}
             <div class="flex-center">
-                <span class="info-text">No controllers found...</span>
+                <span class="info-text">No controllers found in this network...</span>
             </div>
         {/if}
     {:catch error}
