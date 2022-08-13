@@ -70,10 +70,7 @@
 				}
 
 				// This device have at least one controller connected!
-				if (deviceStatus == -2) {
-					// So it's online... Lets try get data but only if is not waiting for data already (status = -1)
-					doMeasurement(true);
-				}
+				deviceStatus = 1;
 			}
 		}
 
@@ -81,12 +78,12 @@
 	}
 	$: updateControllersStatus(controllersAvailable);
 
-	/* function onNewConnection(connId) {
+	function onNewConnection(connId) {
 		if (deviceStatus != -2) {
-			doMeasurement(true);
+			getLastState();
 		}
 	}
-	$: onNewConnection(connId); */
+	$: onNewConnection(connId);
 
 	/* data */
 
@@ -139,7 +136,7 @@
 	<div class="device_led square" class:active={deviceStatus >= 0} class:inactive={deviceStatus < 0}>
 
 		<div class="icon center noselect">
-			<img src="./img/tinaco.svg" alt="Water tank" class="stat_img">
+			<img src="./img/watertank.svg" alt="Water tank" class="stat_img">
 			<span>{`${levelData.e.detail}%`}</span>
 			<span style="font-size: smaller; color: #999;">{timeAgo}</span>
 			<span class="title">{device.name}</span>

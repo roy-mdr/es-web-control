@@ -5,7 +5,7 @@
 	import DeviceActions from './components/DeviceActions.svelte';
 	import DeviceLed from './components/DeviceLed.svelte';
 	import DevicePC from './components/DevicePC.svelte';
-	import DeviceTinaco from './components/DeviceTinaco.svelte';
+	import DeviceWaterTank from './components/DeviceWaterTank.svelte';
 	import DeviceTmpHum from './components/DeviceTmpHum.svelte';
 	import FindControllers from './components/FindControllers.svelte';
 	import dummyData from './dummyData.js';
@@ -346,8 +346,8 @@
 				/>
 			{/if}
 
-			{#if device.type == "tinaco"}
-				<DeviceTinaco
+			{#if device.type == "watertank"}
+				<DeviceWaterTank
 					{device}
 					{controllersAvailable}
 					{connId}
