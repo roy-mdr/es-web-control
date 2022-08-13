@@ -83,7 +83,7 @@
 
 	function onNewConnection(connId) {
 		if (deviceStatus != -2) {
-			doMeasurement();
+			doMeasurement(true);
 		}
 	}
 	$: onNewConnection(connId);
@@ -139,11 +139,8 @@
 	<div class="device_led square" class:active={deviceStatus >= 0} class:inactive={deviceStatus < 0}>
 
 		<div class="icon center noselect">
-			<img src="./img/bulb_on.svg"   alt="Led on"           class="stat_img" class:hidden={deviceStatus !=  1}>
-			<img src="./img/bulb_off.svg"  alt="Led off"          class="stat_img" class:hidden={deviceStatus !=  0}>
-			<img src="./img/loading.svg"   alt="Led waiting"      class="stat_img" class:hidden={deviceStatus != -1}>
-			<img src="./img/bulb_disc.svg" alt="Led disconnected" class="stat_img" class:hidden={deviceStatus != -2}>
-			<span>{`${levelData.e.detail}mm`}</span>
+			<img src="./img/tinaco.svg" alt="Water tank" class="stat_img">
+			<span>{`${levelData.e.detail}%`}</span>
 			<span style="font-size: smaller; color: #999;">{timeAgo}</span>
 			<span class="title">{device.name}</span>
 		</div>
