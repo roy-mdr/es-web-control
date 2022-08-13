@@ -81,12 +81,12 @@
 	}
 	$: updateControllersStatus(controllersAvailable);
 
-	function onNewConnection(connId) {
+	/* function onNewConnection(connId) {
 		if (deviceStatus != -2) {
 			doMeasurement(true);
 		}
 	}
-	$: onNewConnection(connId);
+	$: onNewConnection(connId); */
 
 	/* data */
 
