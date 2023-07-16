@@ -2,16 +2,19 @@
 
 	/* imports */
 	import { onMount } from 'svelte';
+
 	import DeviceActions from './components/DeviceActions.svelte';
 	import DeviceLed from './components/DeviceLed.svelte';
 	import DevicePC from './components/DevicePC.svelte';
 	import DeviceWaterTank from './components/DeviceWaterTank.svelte';
 	import DeviceTmpHum from './components/DeviceTmpHum.svelte';
 	import FindControllers from './components/FindControllers.svelte';
+	import DeviceXry from './components/DeviceXry.svelte';
+	import DeviceXryActions from './components/DeviceXryActions.svelte';
+
 	import dummyData from './dummyData.js';
 	import NPS from './libs/NoPollSubscriber.js';
 	import { lastEvent } from './stores/eventStore.js';
-	import DeviceXry from './components/DeviceXry.svelte';
 
 
 
@@ -375,12 +378,22 @@
  -->
 
 {#if deviceExpanded !== null}
-	<DeviceActions
-		device={deviceExpanded}
-		{controllersAvailable}
-		on:device-close={(ev) => { deviceExpanded = null }}
-		on:sendAction={sendAction}
-	/>
+	{#if deviceExpanded.type == "4xry" || deviceExpanded.type == "8xry"}
+		<DeviceXryActions
+			device={deviceExpanded}
+			{controllersAvailable}
+			relayQuantity={deviceExpanded.type == "4xry" ? 4 : deviceExpanded.type == "8xry" ? 8 : 0}
+			on:device-close={(ev) => { deviceExpanded = null }}
+			on:sendAction={sendAction}
+		/>
+	{:else}
+		<DeviceActions
+			device={deviceExpanded}
+			{controllersAvailable}
+			on:device-close={(ev) => { deviceExpanded = null }}
+			on:sendAction={sendAction}
+		/>
+	{/if}
 {/if}
 
 {#if openFindCtrl}
