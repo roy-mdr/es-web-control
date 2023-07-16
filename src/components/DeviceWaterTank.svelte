@@ -16,6 +16,17 @@
 	onMount(() => {
 		getLastState();
 		updateTimeAgo();
+
+		lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
+			if ( typeof lstEv == 'object' ) {
+				if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
+
+					lastEvent.reset();
+					deviceStatus = 1;
+					readLevelData(lstEv);
+				}
+			}
+		});
 	});
 
 	onDestroy(() => {
@@ -37,17 +48,7 @@
 
 
 	/* stores */
-
-	const lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
-		if ( typeof lstEv == 'object' ) {
-			if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
-
-				lastEvent.reset();
-				deviceStatus = 1;
-				readLevelData(lstEv);
-			}
-		}
-	});
+	let lastEventUnsubscribe;
 
 
 	/* watchers */

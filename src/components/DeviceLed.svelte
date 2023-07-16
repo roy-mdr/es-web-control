@@ -12,9 +12,26 @@
 
 
 	/* life cycle */
-	/* onMount(() => {
-		getLedState();
-	}); */
+	onMount(() => {
+		// getLedState();
+
+		lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
+			if ( typeof lstEv == 'object' ) {
+				if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
+
+					lastEvent.reset();
+
+					if (lstEv.e.detail == 1) {
+						deviceStatus = 1;
+					}
+
+					if (lstEv.e.detail == 0) {
+						deviceStatus = 0;
+					}
+				}
+			}
+		});
+	});
 
 	onDestroy(() => {
 		lastEventUnsubscribe();
@@ -35,23 +52,7 @@
 
 
 	/* stores */
-
-	const lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
-		if ( typeof lstEv == 'object' ) {
-			if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
-
-				lastEvent.reset();
-
-				if (lstEv.e.detail == 1) {
-					deviceStatus = 1;
-				}
-
-				if (lstEv.e.detail == 0) {
-					deviceStatus = 0;
-				}
-			}
-		}
-	});
+	let lastEventUnsubscribe;
 
 
 	/* watchers */

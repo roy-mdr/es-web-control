@@ -1,7 +1,7 @@
 <script>
 
 	/* imports */
-	import { onDestroy, createEventDispatcher } from 'svelte';
+	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import Modal from './Modal.svelte';
 	import { lastEvent } from '../stores/eventStore.js';
 
@@ -12,6 +12,21 @@
 
 
   /* life cycle */
+  onMount(() => {
+    lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
+      if ( typeof lstEv == 'object' ) {
+        if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
+
+          lastEvent.reset();
+
+          responses.push(lstEv);
+          responses = responses;
+          console.log("RESPONSES gotEvent:", responses);
+        }
+      }
+    });
+	});
+
   onDestroy(() => {
     lastEventUnsubscribe();
   });
@@ -45,19 +60,7 @@
 
 
   /* stores */
-
-  const lastEventUnsubscribe = lastEvent.subscribe(lstEv => {
-    if ( typeof lstEv == 'object' ) {
-      if ( lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep ) {
-
-        lastEvent.reset();
-
-        responses.push(lstEv);
-        responses = responses;
-        console.log("RESPONSES gotEvent:", responses);
-      }
-    }
-  });
+  let lastEventUnsubscribe;
 
 
 	/* watchers */
