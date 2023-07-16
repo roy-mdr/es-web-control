@@ -11,6 +11,7 @@
 	import dummyData from './dummyData.js';
 	import NPS from './libs/NoPollSubscriber.js';
 	import { lastEvent } from './stores/eventStore.js';
+	import DeviceXry from './components/DeviceXry.svelte';
 
 
 
@@ -352,6 +353,14 @@
 					{controllersAvailable}
 					{connId}
 					on:sendAction={sendAction}
+				/>
+			{/if}
+
+			{#if device.type == "4xry" || device.type == "8xry"}
+				<DeviceXry
+					{device}
+					{controllersAvailable}
+					on:device-expanded={(ev) => { deviceExpanded = ev.detail.device }}
 				/>
 			{/if}
 
