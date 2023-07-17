@@ -97,9 +97,12 @@
 
 	function initRyObjs() {
 		// Create relay-objects based on the number of relays given in relayQuantity
-		for (let index = 0; index < relayQuantity; index++) {
+		for (let ix = 0; ix < relayQuantity; ix++) {
+
+			const ryId = `ry${ix + 1}`;
+
 			ryObjects.push({
-				name: `Relay ${index + 1}`,
+				name: device.alias[ryId] || `Relay ${ix + 1}`,
 				status: -2
 			});
 		}

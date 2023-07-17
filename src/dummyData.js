@@ -294,6 +294,12 @@ export default [
 		name: '8x Relay',
 		description: '8x Relay Gus',
 		ep: 'controll/relay/relay8x_gus/res',
+		alias: {
+			"ry1": "Jardín húmedo",
+			"ry2": "Jardín frontal",
+			"ry5": "Terraza",
+			"ry6": "Patio trasero"
+		},
 		actions: [
 			{
 				controller: 'ctrl_8xry-0001',
