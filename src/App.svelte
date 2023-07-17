@@ -12,6 +12,7 @@
 	import DeviceXry from './components/DeviceXry.svelte';
 	import DeviceXryActions from './components/DeviceXryActions.svelte';
 
+	import config from './config.js';
 	import dummyData from './dummyData.js';
 	import NPS from './libs/NoPollSubscriber.js';
 	import { lastEvent } from './stores/eventStore.js';
@@ -40,36 +41,39 @@
 	
 	function fetchData() {
 
-		// DEV:
-		/*
-		
-		devices = dummyData;
+		if (config.DEVELOPER_MODE) {
+			devices = dummyData;
 
-		devices.forEach( (device) => {
+			devices.forEach( (device) => {
 
-						if ( !eventPoints.includes(device.ep) ) {
-							eventPoints.push(device.ep);
-						}
+				if ( !eventPoints.includes(device.ep) ) {
+					eventPoints.push(device.ep);
+				}
 
-						device.actions.forEach( (action) => {
-							const controllerStatusEp = `@CONNECTION@/${action.controller}`;
-							if ( !eventPoints.includes(controllerStatusEp) ) {
-								eventPoints.push(controllerStatusEp);
-							}
-						} );
+				device.actions.forEach( (action) => {
+					const controllerStatusEp = `@CONNECTION@/${action.controller}`;
+					if ( !eventPoints.includes(controllerStatusEp) ) {
+						eventPoints.push(controllerStatusEp);
+					}
+				} );
 
-					} );
+			} );
 
-					eventPoints = eventPoints;
-					
-					return;
-		*/
+			eventPoints = eventPoints;
+
+			return;
+		}
 
 		// ----------------------------------------------------------
 
 		// return new Promise( (resolve, reject) => {
 
-			fetch(`/controll/get_devices.php`)
+			let pubServer = "/";
+			if (config.USE_EXTERNAL_SERVERS) {
+				pubServer = config.EXTERNAL_PUB_SERVER
+			}
+
+			fetch(`${pubServer}controll/get_devices.php`)
 				.then( (res) => res.json() )
 				.then( (data) => {
 					devices = data;
@@ -107,7 +111,13 @@
 		}
 
 		console.log("Sending event:", ev);
-		fetch(`/controll/req.php?device=${ev.detail.device_id}&whisper=${connId}`, {
+
+		let pubServer = "/";
+		if (config.USE_EXTERNAL_SERVERS) {
+			pubServer = config.EXTERNAL_PUB_SERVER
+		}
+
+		fetch(`${pubServer}controll/req.php?device=${ev.detail.device_id}&whisper=${connId}`, {
 			method: 'POST', // *GET, POST, PUT, DELETE, etc.
 			// mode: 'cors', // no-cors, *cors, same-origin
 			// cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -279,9 +289,13 @@
 			let hostNoPort = window.location.host.split(':')[0];
 			if ( window.location.protocol == "http:" ) { port = 1010 /*1011*/; }
 			if ( window.location.protocol == "https:" ) { port = 1011; }
-			// return `https://notify.estudiosustenta.myds.me/`;
-			return `${window.location.protocol}//${hostNoPort}:${port}/`;
-			
+
+			if (config.USE_EXTERNAL_SERVERS) {
+				return config.EXTERNAL_SUB_SERVER;
+			} else {
+				return `${window.location.protocol}//${hostNoPort}:${port}/`;
+			}
+
 		} else {
 			return `${window.location.protocol}//notify.${window.location.host}/`;
 		}
