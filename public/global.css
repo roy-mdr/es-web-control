@@ -1,7 +1,7 @@
 /* ---------- GENERAL ---------- */
 
 * {
-	font-family: "Trebuchet MS";
+	font-family: 'Trebuchet MS';
 }
 
 *:focus {
@@ -11,7 +11,7 @@
 body {
 	margin: 0;
 	padding: 0;
-	background-color: #F1F3F4;
+	background-color: #f1f3f4;
 	width: 100%;
 }
 
@@ -50,18 +50,13 @@ body.modal-open {
 
 .noselect {
 	-webkit-touch-callout: none; /* iOS Safari */
-		-webkit-user-select: none; /* Safari */
-		-khtml-user-select: none; /* Konqueror HTML */
-			-moz-user-select: none; /* Old versions of Firefox */
-			-ms-user-select: none; /* Internet Explorer/Edge */
-				user-select: none; /* Non-prefixed version, currently
+	-webkit-user-select: none; /* Safari */
+	-khtml-user-select: none; /* Konqueror HTML */
+	-moz-user-select: none; /* Old versions of Firefox */
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none; /* Non-prefixed version, currently
 									supported by Chrome, Edge, Opera and Firefox */
 }
-
-
-
-
-
 
 /*
 html, body {

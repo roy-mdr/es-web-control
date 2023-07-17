@@ -1,6 +1,6 @@
 <script>
 	/* imports */
-	import { onMount, createEventDispatcher } from "svelte";
+	import { onMount, createEventDispatcher } from 'svelte';
 
 	/* props */
 	export let device = {};
@@ -16,7 +16,7 @@
 	const dispatch = createEventDispatcher();
 
 	function expandDevice(deviceObj) {
-		dispatch("device-expanded", { device: deviceObj });
+		dispatch('device-expanded', { device: deviceObj });
 	}
 
 	/* watchers */
@@ -48,11 +48,7 @@
 	let deviceStatus = -2;
 </script>
 
-<div
-	class="multy_relay square"
-	class:active={deviceStatus >= 0}
-	class:inactive={deviceStatus < 0}
->
+<div class="multy_relay square" class:active={deviceStatus >= 0} class:inactive={deviceStatus < 0}>
 	<div class="icon center noselect">
 		<img
 			src="./img/bulb_on.svg"

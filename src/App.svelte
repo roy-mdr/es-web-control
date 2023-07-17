@@ -1,5 +1,4 @@
 <script>
-
 	/* imports */
 	import { onMount } from 'svelte';
 
@@ -17,47 +16,38 @@
 	import NPS from './libs/NoPollSubscriber.js';
 	import { lastEvent } from './stores/eventStore.js';
 
-
-
 	/* life cycle */
 	onMount(() => {
 		fetchData();
 		setMayStart(true);
 	});
 
-
-
 	/* props */
 	// export let name;
 
-
-	
 	/* logic */
 	let devices = [];
 	let controllersAvailable = [];
 	let deviceExpanded = null;
 	let eventPoints = [];
 	let openFindCtrl = false;
-	
-	function fetchData() {
 
+	function fetchData() {
 		if (config.DEVELOPER_MODE) {
 			devices = dummyData;
 
-			devices.forEach( (device) => {
-
-				if ( !eventPoints.includes(device.ep) ) {
+			devices.forEach((device) => {
+				if (!eventPoints.includes(device.ep)) {
 					eventPoints.push(device.ep);
 				}
 
-				device.actions.forEach( (action) => {
+				device.actions.forEach((action) => {
 					const controllerStatusEp = `@CONNECTION@/${action.controller}`;
-					if ( !eventPoints.includes(controllerStatusEp) ) {
+					if (!eventPoints.includes(controllerStatusEp)) {
 						eventPoints.push(controllerStatusEp);
 					}
-				} );
-
-			} );
+				});
+			});
 
 			eventPoints = eventPoints;
 
@@ -68,53 +58,50 @@
 
 		// return new Promise( (resolve, reject) => {
 
-			let pubServer = "/";
-			if (config.USE_EXTERNAL_SERVERS) {
-				pubServer = config.EXTERNAL_PUB_SERVER
-			}
+		let pubServer = '/';
+		if (config.USE_EXTERNAL_SERVERS) {
+			pubServer = config.EXTERNAL_PUB_SERVER;
+		}
 
-			fetch(`${pubServer}controll/get_devices.php`)
-				.then( (res) => res.json() )
-				.then( (data) => {
-					devices = data;
+		fetch(`${pubServer}controll/get_devices.php`)
+			.then((res) => res.json())
+			.then((data) => {
+				devices = data;
 
-					devices.forEach( (device) => {
-						if ( !eventPoints.includes(device.ep) ) {
-							eventPoints.push(device.ep);
+				devices.forEach((device) => {
+					if (!eventPoints.includes(device.ep)) {
+						eventPoints.push(device.ep);
+					}
+
+					device.actions.forEach((action) => {
+						const controllerStatusEp = `@CONNECTION@/${action.controller}`;
+						if (!eventPoints.includes(controllerStatusEp)) {
+							eventPoints.push(controllerStatusEp);
 						}
+					});
+				});
 
-						device.actions.forEach( (action) => {
-							const controllerStatusEp = `@CONNECTION@/${action.controller}`;
-							if ( !eventPoints.includes(controllerStatusEp) ) {
-								eventPoints.push(controllerStatusEp);
-							}
-						} );
+				eventPoints = eventPoints;
+			})
+			.catch((er) => {
+				console.error(er);
+			});
 
-					} );
-
-					eventPoints = eventPoints;
-
-				} )
-				.catch( (er) => { console.error(er); } )
-			
 		// } );
 	}
 
-
-
 	function sendAction(ev) {
-
 		if (connId == undefined) {
 			console.log("We don't have a connection Id yet. Queeing event:", ev);
 			evQuee.push(ev);
 			return;
 		}
 
-		console.log("Sending event:", ev);
+		console.log('Sending event:', ev);
 
-		let pubServer = "/";
+		let pubServer = '/';
 		if (config.USE_EXTERNAL_SERVERS) {
-			pubServer = config.EXTERNAL_PUB_SERVER
+			pubServer = config.EXTERNAL_PUB_SERVER;
 		}
 
 		fetch(`${pubServer}controll/req.php?device=${ev.detail.device_id}&whisper=${connId}`, {
@@ -132,8 +119,6 @@
 		});
 	}
 
-
-
 	/* Pub Sub Subscription */
 
 	let connId;
@@ -142,11 +127,9 @@
 	let aliveLoop;
 
 	function begginAliveLoop() {
-
 		clearTimeout(aliveLoop);
 
-		aliveLoop = setTimeout(function() {
-
+		aliveLoop = setTimeout(function () {
 			if (!connectedToBroker) {
 				clearTimeout(aliveLoop);
 				return;
@@ -159,21 +142,20 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({connid: connId, secret: connSecret})
+				body: JSON.stringify({ connid: connId, secret: connSecret })
 			})
-				.then(response => response.json())
-				.then(data => {
-					connId      = data.connid;
-					connSecret  = data.secret;
+				.then((response) => response.json())
+				.then((data) => {
+					connId = data.connid;
+					connSecret = data.secret;
 					connTimeout = data.timeout;
 				})
-				.catch(error => {
+				.catch((error) => {
 					console.error('Error on Alive request:', error);
 					clearTimeout(aliveLoop);
-				})
+				});
 
 			begginAliveLoop();
-
 		}, connTimeout - 3000); // timeout - 3 seconds
 	}
 
@@ -185,52 +167,42 @@
 
 	$: subOptions = {
 		url: getSubUrl(),
-		method: "POST",
+		method: 'POST',
 		data: JSON.stringify({
 			clid: 'web_iot_controll',
 			ep: eventPoints
 		})
-	}
+	};
 
-	let subscription = new NPS(subOptions,
-		sub_OnParsed,
-		sub_OnSubscribe,
-		sub_OnStateChange
-	);
+	let subscription = new NPS(subOptions, sub_OnParsed, sub_OnSubscribe, sub_OnStateChange);
 
 	function startSub(subOptions) {
 		if (mayStart) {
 			subscription.start(subOptions);
 		}
 	}
-	
+
 	/* watchers */
 
 	$: startSub(subOptions);
 	$: console.log(subOptions);
 	$: sendQueeEvents(connId);
 
-
-
 	function sub_OnParsed(data) {
-
-		console.log("On Parsed: ", data);
+		console.log('On Parsed: ', data);
 
 		const event = JSON.parse(data);
 
-		
-
-		if ( event.ep.emitted == '@SERVER@' ) {
+		if (event.ep.emitted == '@SERVER@') {
 			connId = event.e.detail.connid;
 			connSecret = event.e.detail.secret;
 			connTimeout = event.e.detail.timeout;
 			begginAliveLoop();
-		} else if ( /^@CONNECTION@\/[^\/]+$/.test(event.ep.emitted) ) {
-
+		} else if (/^@CONNECTION@\/[^\/]+$/.test(event.ep.emitted)) {
 			const controllerClid = event.ep.emitted.split('/')[1];
 			if (event.e.detail.clid_instances > 0) {
 				// Add controllerId to controllers available
-				if ( !controllersAvailable.includes(controllerClid) ) {
+				if (!controllersAvailable.includes(controllerClid)) {
 					controllersAvailable.push(controllerClid);
 					controllersAvailable = controllersAvailable;
 				}
@@ -242,19 +214,18 @@
 					controllersAvailable = controllersAvailable;
 				}
 			}
-
 		} else {
 			lastEvent.set(event);
 		}
 	}
 
 	function sub_OnSubscribe(data) {
-		console.log("On Subscribe: ", data);
+		console.log('On Subscribe: ', data);
 		connectedToBroker = true;
 	}
 
 	function sub_OnStateChange(state) {
-		console.log("On State Change: ", state);
+		console.log('On State Change: ', state);
 
 		notifBrokerState = state.value;
 
@@ -270,121 +241,116 @@
 	let evQuee = [];
 
 	function sendQueeEvents(connId) {
-		evQuee.forEach( ev => {
+		evQuee.forEach((ev) => {
 			evQuee.shift();
 			sendAction(ev);
-		})
+		});
 	}
 
 	function getSubUrl() {
-		if ( /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(window.location.host) ) {
+		if (/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(window.location.host)) {
 			let port = 0;
 			let hostNoPort = window.location.host.split(':')[0];
-			if ( window.location.protocol == "http:" ) { port = /*1010*/ 1011; }
-			if ( window.location.protocol == "https:" ) { port = 1011; }
+			if (window.location.protocol == 'http:') {
+				port = /*1010*/ 1011;
+			}
+			if (window.location.protocol == 'https:') {
+				port = 1011;
+			}
 			return `${window.location.protocol}//${hostNoPort}:${port}/`;
-
-		} else if ( /^localhost/.test(window.location.host) ) {
+		} else if (/^localhost/.test(window.location.host)) {
 			let port = 0;
 			let hostNoPort = window.location.host.split(':')[0];
-			if ( window.location.protocol == "http:" ) { port = 1010 /*1011*/; }
-			if ( window.location.protocol == "https:" ) { port = 1011; }
+			if (window.location.protocol == 'http:') {
+				port = 1010 /*1011*/;
+			}
+			if (window.location.protocol == 'https:') {
+				port = 1011;
+			}
 
 			if (config.USE_EXTERNAL_SERVERS) {
 				return config.EXTERNAL_SUB_SERVER;
 			} else {
 				return `${window.location.protocol}//${hostNoPort}:${port}/`;
 			}
-
 		} else {
 			return `${window.location.protocol}//notify.${window.location.host}/`;
 		}
 	}
-
 </script>
 
 <div id="statBar">
 	<div style="display: flex; align-items: center; justify-content: center;">
-		<div id="notifStatus" style="width: 10px; height: 10px; border-radius: 5px; margin-right: 1em;"
-		class:wifioff={notifBrokerState == -1}
-		class:disconnected={notifBrokerState == 0}
-		class:waiting={notifBrokerState == 1}
-		class:connected={notifBrokerState == 2}
-		></div>
+		<div
+			id="notifStatus"
+			style="width: 10px; height: 10px; border-radius: 5px; margin-right: 1em;"
+			class:wifioff={notifBrokerState == -1}
+			class:disconnected={notifBrokerState == 0}
+			class:waiting={notifBrokerState == 1}
+			class:connected={notifBrokerState == 2}
+		/>
 
 		{#if notifBrokerState === undefined}
-		...
+			...
 		{/if}
 
 		{#if notifBrokerState === -1}
-		WiFi Off
+			WiFi Off
 		{/if}
 
 		{#if notifBrokerState === 0}
-		Disconnected
+			Disconnected
 		{/if}
 
 		{#if notifBrokerState === 1}
-		Waiting...
+			Waiting...
 		{/if}
 
 		{#if notifBrokerState === 2}
-		Connected
+			Connected
 		{/if}
 	</div>
 
-
-	<button on:click={() => openFindCtrl = true}>Discovery</button>
+	<button on:click={() => (openFindCtrl = true)}>Discovery</button>
 </div>
 
 <div id="deviceContainer">
 	{#if connectedToBroker}
 		{#each devices as device}
-
-			{#if device.type == "led"}
-				<DeviceLed
-					{device}
-					{controllersAvailable}
-					{connId}
-					on:sendAction={sendAction}
-				/>
+			{#if device.type == 'led'}
+				<DeviceLed {device} {controllersAvailable} {connId} on:sendAction={sendAction} />
 			{/if}
 
-			{#if device.type == "pc"}
+			{#if device.type == 'pc'}
 				<DevicePC
 					{device}
 					{controllersAvailable}
-					on:device-expanded={(ev) => { deviceExpanded = ev.detail.device }}
+					on:device-expanded={(ev) => {
+						deviceExpanded = ev.detail.device;
+					}}
 				/>
 			{/if}
 
-			{#if device.type == "tmphum"}
-				<DeviceTmpHum
-					{device}
-				/>
+			{#if device.type == 'tmphum'}
+				<DeviceTmpHum {device} />
 			{/if}
 
-			{#if device.type == "watertank"}
-				<DeviceWaterTank
-					{device}
-					{controllersAvailable}
-					{connId}
-					on:sendAction={sendAction}
-				/>
+			{#if device.type == 'watertank'}
+				<DeviceWaterTank {device} {controllersAvailable} {connId} on:sendAction={sendAction} />
 			{/if}
 
-			{#if device.type == "4xry" || device.type == "8xry"}
+			{#if device.type == '4xry' || device.type == '8xry'}
 				<DeviceXry
 					{device}
 					{controllersAvailable}
-					on:device-expanded={(ev) => { deviceExpanded = ev.detail.device }}
+					on:device-expanded={(ev) => {
+						deviceExpanded = ev.detail.device;
+					}}
 				/>
 			{/if}
-
 		{/each}
 	{/if}
 </div>
-
 
 <!-- 
 <h1>Hello {name}!</h1>
@@ -392,26 +358,30 @@
  -->
 
 {#if deviceExpanded !== null}
-	{#if deviceExpanded.type == "4xry" || deviceExpanded.type == "8xry"}
+	{#if deviceExpanded.type == '4xry' || deviceExpanded.type == '8xry'}
 		<DeviceXryActions
 			device={deviceExpanded}
 			{controllersAvailable}
-			relayQuantity={deviceExpanded.type == "4xry" ? 4 : deviceExpanded.type == "8xry" ? 8 : 0}
-			on:device-close={(ev) => { deviceExpanded = null }}
+			relayQuantity={deviceExpanded.type == '4xry' ? 4 : deviceExpanded.type == '8xry' ? 8 : 0}
+			on:device-close={(ev) => {
+				deviceExpanded = null;
+			}}
 			on:sendAction={sendAction}
 		/>
 	{:else}
 		<DeviceActions
 			device={deviceExpanded}
 			{controllersAvailable}
-			on:device-close={(ev) => { deviceExpanded = null }}
+			on:device-close={(ev) => {
+				deviceExpanded = null;
+			}}
 			on:sendAction={sendAction}
 		/>
 	{/if}
 {/if}
 
 {#if openFindCtrl}
-	<FindControllers on:close={() => openFindCtrl = false}/>
+	<FindControllers on:close={() => (openFindCtrl = false)} />
 {/if}
 
 <style>
@@ -485,7 +455,6 @@
 	}
 
 	#notifStatus.connected {
-		background-color: #ABDBA9;
+		background-color: #abdba9;
 	}
-
 </style>

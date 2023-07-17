@@ -9,73 +9,76 @@ class NoPollSubscriber {
 	  page loading indicator.
 	************************************************/
 
-
-
 	/////////////////////////////////////////////////
 	////////////////// CONSTRUCTOR //////////////////
 
-	constructor(urlOrObj, callbackOnParsed = ()=>{}, callbackOnSubscribe = ()=>{}, callbackOnStateChange = ()=>{}) {
-
+	constructor(
+		urlOrObj,
+		callbackOnParsed = () => {},
+		callbackOnSubscribe = () => {},
+		callbackOnStateChange = () => {}
+	) {
 		// PRIVATE ATTRIBUTES //
-		this._XHR          = this._setHTTPRequest(urlOrObj);
-		this._bindURL      = '';
-		this._onParsed     = callbackOnParsed;
-		this._onSubscribe  = callbackOnSubscribe;
-		this._onStChange   = callbackOnStateChange;
-		this._responseLen  = 0;
-		this._dataMem      = '';
+		this._XHR = this._setHTTPRequest(urlOrObj);
+		this._bindURL = '';
+		this._onParsed = callbackOnParsed;
+		this._onSubscribe = callbackOnSubscribe;
+		this._onStChange = callbackOnStateChange;
+		this._responseLen = 0;
+		this._dataMem = '';
 		this._fullResponse = null;
-		this._subscribed   = false;
-		this._stopped      = false;
-		this._separator    = "''";
-		this._httpCall     = this._ajaxReq();
+		this._subscribed = false;
+		this._stopped = false;
+		this._separator = "''";
+		this._httpCall = this._ajaxReq();
 		this._retryTimeout = setTimeout(() => {}, 0);
-		this._lastIat      = 0;
+		this._lastIat = 0;
 
 		// SET EVENT LISTENERS //
 		this._addOnlineListeners();
 		// this._remOnlineListeners();
-
 	}
-
-
-
-
 
 	/////////////////////////////////////////////////
 	//////////////// PUBLIC METHODS ////////////////
 
-	start( urlOrObj              = this._XHR,
-	       callbackOnParsed      = this._onParsed,
-	       callbackOnSubscribe   = this._onSubscribe,
-	       callbackOnStateChange = this._onStChange ) { // Start, restart and resume paused
+	start(
+		urlOrObj = this._XHR,
+		callbackOnParsed = this._onParsed,
+		callbackOnSubscribe = this._onSubscribe,
+		callbackOnStateChange = this._onStChange
+	) {
+		// Start, restart and resume paused
 
 		this.stop();
 		this.abort();
 		clearTimeout(this._retryTimeout);
 		this.setURL(urlOrObj);
 
-		this._stopped      = false;
-		this._onParsed     = callbackOnParsed;
-		this._onSubscribe  = callbackOnSubscribe;
-		this._onStChange   = callbackOnStateChange;
+		this._stopped = false;
+		this._onParsed = callbackOnParsed;
+		this._onSubscribe = callbackOnSubscribe;
+		this._onStChange = callbackOnStateChange;
 
 		this._subscribe();
 	}
 
-	stop() { // Wont call again when ready state == 4
+	stop() {
+		// Wont call again when ready state == 4
 		this._stopped = true;
 	}
 
-	abort() { // Abort connection (will retry, so to fully stop: fist stop() then abort())
+	abort() {
+		// Abort connection (will retry, so to fully stop: fist stop() then abort())
 		clearTimeout(this._retryTimeout);
 		this._httpCall.abort();
 		this._dataMem = '';
 	}
 
-	validateIat(rawString) { // Experimental...
+	validateIat(rawString) {
+		// Experimental...
 
-		if ( typeof rawString !== 'string' ) {
+		if (typeof rawString !== 'string') {
 			console.error('Parameter should be a JSON encoded string.');
 			return;
 		}
@@ -83,22 +86,18 @@ class NoPollSubscriber {
 		this._validateIat(rawString);
 	}
 
-
-
-
-
 	/////////////////////////////////////////////////
 	//////////////// PRIVATE METHODS ////////////////
 
 	_addOnlineListeners() {
 		window.NoPollSubscriber = this;
-		window.addEventListener('online',  this._isOnline );
+		window.addEventListener('online', this._isOnline);
 		window.addEventListener('offline', this._isOffline);
 	}
 
 	_remOnlineListeners() {
 		delete window.NoPollSubscriber;
-		window.removeEventListener('online',  this._isOnline );
+		window.removeEventListener('online', this._isOnline);
 		window.removeEventListener('offline', this._isOffline);
 	}
 
@@ -115,13 +114,15 @@ class NoPollSubscriber {
 		// console.log(ev);
 		ev.target.NoPollSubscriber.stop();
 		ev.target.NoPollSubscriber.abort();
-		ev.target.NoPollSubscriber._onStChange({value:-1,state:"OFFLINE"});
+		ev.target.NoPollSubscriber._onStChange({ value: -1, state: 'OFFLINE' });
 	}
 
 	_setHTTPRequest(request) {
-
-		if ( (typeof request !== 'string') && (typeof request !== 'object') ) {
-			console.error('What are you requesting?', 'Request should be a string or an object with options.');
+		if (typeof request !== 'string' && typeof request !== 'object') {
+			console.error(
+				'What are you requesting?',
+				'Request should be a string or an object with options.'
+			);
 			return;
 		}
 
@@ -132,32 +133,31 @@ class NoPollSubscriber {
 		}
 
 		if (typeof request === 'object') {
-
-			if ( !('url' in request) ) {
+			if (!('url' in request)) {
 				console.error('should pass url');
 				return;
 			}
 
-			if ( typeof request.url !== 'string') {
+			if (typeof request.url !== 'string') {
 				console.error('url should be a string');
 				return;
 			}
 
-			if ( ('method' in request) && typeof request.method !== 'string') {
+			if ('method' in request && typeof request.method !== 'string') {
 				console.error('method should be a string');
 				return;
 			}
 
-			if ( ('data' in request) && typeof request.data !== 'string') {
+			if ('data' in request && typeof request.data !== 'string') {
 				request.data = JSON.stringify(request.data);
 			}
 
-			if ( 'headers' in request ) {
+			if ('headers' in request) {
 				if (typeof request.headers !== 'object') {
 					console.error('headers should be an object');
 					return;
 				} else {
-					for ( const key in request.headers ) {
+					for (const key in request.headers) {
 						if (typeof request.headers[key] !== 'string') {
 							console.error(`header '${key}' should be a string`);
 							return;
@@ -166,26 +166,24 @@ class NoPollSubscriber {
 				}
 			}
 
-			if ( 'dataType' in request ) {
-
+			if ('dataType' in request) {
 				if (typeof request.dataType !== 'string') {
 					console.error('dataType should be a string');
 					return;
 				} else {
-					('headers' in request) || (request.headers = {})
+					'headers' in request || (request.headers = {});
 					request.headers['Content-Type'] = request.dataType;
 				}
-				
 			}
 		}
 
 		const xhr = {
-			url:     request.url,
-			method:  request.method  || 'GET',
-			data:    request.data    || undefined,
+			url: request.url,
+			method: request.method || 'GET',
+			data: request.data || undefined,
 			headers: request.headers || {}
-		}
-		
+		};
+
 		// console.log(xhr);
 
 		return xhr;
@@ -199,7 +197,6 @@ class NoPollSubscriber {
 		const bUpdated = obj._httpCall.responseText.length - obj._responseLen;
 		obj._responseLen = obj._httpCall.responseText.length;
 
-		
 		/*
 		// Very useful logging
 		console.log(
@@ -209,7 +206,8 @@ class NoPollSubscriber {
 			`(HTTP response state: ${obj._httpCall.readyState})`);
 		*/
 
-		if ( obj._dataMem.length > 0 ) { // If there is data in memory
+		if (obj._dataMem.length > 0) {
+			// If there is data in memory
 			payload = obj._dataMem + response; // Add it to the beginning
 		} else {
 			payload = response;
@@ -217,55 +215,52 @@ class NoPollSubscriber {
 
 		obj._dataMem = ''; // Empty memory
 
-		obj._parseChunks( payload.split(obj._separator) );
+		obj._parseChunks(payload.split(obj._separator));
 	}
-
 
 	_parseChunks(array) {
 		const obj = this;
 
 		let expLen = 0;
 
-		if ( array[0].replace(/\s/g, '').length == 0) { array.shift(); }
+		if (array[0].replace(/\s/g, '').length == 0) {
+			array.shift();
+		}
 
-		if ( array.length == 0 ) {
+		if (array.length == 0) {
 			return false;
 		}
 
-		if ( array.length == 1 ) {
+		if (array.length == 1) {
 			obj._dataMem = array[0];
 			return false;
 		}
 
 		expLen = array.shift();
 
-		if ( array[0].length < expLen ) {
+		if (array[0].length < expLen) {
 			obj._dataMem = expLen + obj._separator + array[0];
 			return false;
 		} else {
-
-			if ( expLen > 0) {
+			if (expLen > 0) {
 				const cData = array[0].substring(0, expLen);
 
 				// if ( obj._validateIat( cData ) ) { // Optional
-					obj._onParsed( cData );
+				obj._onParsed(cData);
 				// }
 			}
 
-			if ( array.length > 1 ) {
+			if (array.length > 1) {
 				array.shift();
 				obj._parseChunks(array);
 			} else {
-				if ( array[0].substring(expLen, array[0].length).replace(/\s/g, '').length != 0 ) {
+				if (array[0].substring(expLen, array[0].length).replace(/\s/g, '').length != 0) {
 					obj._dataMem = array[0];
 				}
 				return false;
 			}
-			
 		}
-
 	}
-
 
 	_validateIat(rawString) {
 		const obj = this;
@@ -274,19 +269,28 @@ class NoPollSubscriber {
 
 		try {
 			jData = JSON.parse(rawString);
-		} catch(er) {
-			console.warn(`Data received is not valid JSON.`, `Timestamp validation was not done... Returning data anyway.`);
+		} catch (er) {
+			console.warn(
+				`Data received is not valid JSON.`,
+				`Timestamp validation was not done... Returning data anyway.`
+			);
 			console.error(er);
 			return true;
 		}
 
-		if ( !('iat' in jData) ) {
-			console.warn(`Data received does not match expected format: {"iat": Unixtime, "payload": Object}`, `Timestamp validation was not done... Returning data anyway.`);
+		if (!('iat' in jData)) {
+			console.warn(
+				`Data received does not match expected format: {"iat": Unixtime, "payload": Object}`,
+				`Timestamp validation was not done... Returning data anyway.`
+			);
 			return true;
 		}
 
-		if ( !((new Date(jData.iat)).getTime() > 0) ) {
-			console.warn(`Timestamp received is invalid.`, `Timestamp validation was not done... Returning data anyway.`);
+		if (!(new Date(jData.iat).getTime() > 0)) {
+			console.warn(
+				`Timestamp received is invalid.`,
+				`Timestamp validation was not done... Returning data anyway.`
+			);
 			return true;
 		}
 
@@ -297,46 +301,38 @@ class NoPollSubscriber {
 			obj._lastIat = jData.iat;
 			return true;
 		}
-
 	}
-
-
 
 	_ajaxReq() {
 		if (window.XMLHttpRequest) {
 			return new XMLHttpRequest();
 		} else if (window.ActiveXObject) {
-			return new ActiveXObject("Microsoft.XMLHTTP");
+			return new ActiveXObject('Microsoft.XMLHTTP');
 		} else {
-			alert("Browser does not support XMLHTTP.");
+			alert('Browser does not support XMLHTTP.');
 			return false;
 		}
 	}
-
-
 
 	_subscribe() {
 		if (this._stopped) return false;
 		const obj = this;
 
-
 		obj._subscribed = false;
 		// obj._onStChange({value:1,state:"WAITING"});
 
-		obj._httpCall.open( obj._XHR.method, obj._XHR.url, true);
+		obj._httpCall.open(obj._XHR.method, obj._XHR.url, true);
 
-		for ( const key in obj._XHR.headers ) {
+		for (const key in obj._XHR.headers) {
 			obj._httpCall.setRequestHeader(key, obj._XHR.headers[key]);
 		}
-
 
 		// THIS CODE WILL EXECUTE WHEN NEW CHUNK OF DATA IS RECEIVED
 		obj._responseLen = 0;
 		obj._httpCall.onprogress = (ev) => {
 			// code...
 			obj._logicOnChunk();
-		}
-
+		};
 
 		/*
 		// THIS CODE ACTS THE SAME AS obj._httpCall.onprogress
@@ -348,11 +344,9 @@ class NoPollSubscriber {
 		};
 		*/
 
-
 		// THIS CODE WILL EXECUTE WHEN THE POLLING FINISHES
 		// SO WE LOOP THE SUBSRIBE FUNCTION TO KEEP POLLING
 		obj._httpCall.onreadystatechange = (ev) => {
-
 			/****************************************************************************************
 			XMLHttpRequest.readyState
 			-----------------------------------------------------------------------------------------
@@ -387,79 +381,76 @@ class NoPollSubscriber {
 			****************************************************************************************/
 
 			if (ev.target.readyState == 0) {
-				obj._onStChange({value:0,state:"DISCONNECTED"});
+				obj._onStChange({ value: 0, state: 'DISCONNECTED' });
 			}
 
 			if (ev.target.readyState == 1) {
-				obj._onStChange({value:1,state:"WAITING"});
+				obj._onStChange({ value: 1, state: 'WAITING' });
 			}
 
 			if (ev.target.readyState == 2) {
 				if (ev.target.status >= 200 && ev.target.status < 300) {
-					obj._onStChange({value:2,state:"CONNECTED"});
+					obj._onStChange({ value: 2, state: 'CONNECTED' });
 				} else {
-					obj._onStChange({value:0,state:"DISCONNECTED"});
+					obj._onStChange({ value: 0, state: 'DISCONNECTED' });
 				}
 			}
 
 			if (ev.target.readyState == 3) {
 				if (ev.target.status >= 200 && ev.target.status < 300) {
-					obj._onStChange({value:2,state:"CONNECTED"});
-					if ( !obj._subscribed ) {
+					obj._onStChange({ value: 2, state: 'CONNECTED' });
+					if (!obj._subscribed) {
 						obj._subscribed = true;
 						obj._onSubscribe();
 					}
 				} else {
-					obj._onStChange({value:0,state:"DISCONNECTED"});
+					obj._onStChange({ value: 0, state: 'DISCONNECTED' });
 				}
 			}
 
 			if (ev.target.readyState == 4) {
-
 				if (ev.target.status >= 200 && ev.target.status < 300) {
-
 					if (ev.target.response.length == 0) {
-						obj._onStChange({value:0,state:"DISCONNECTED"});
+						obj._onStChange({ value: 0, state: 'DISCONNECTED' });
 						console.error('No bytes were received. Breaking loop... Retrying in 5 seconds.');
-						obj._retryTimeout = setTimeout( () => { obj._subscribe() }, 5000);
+						obj._retryTimeout = setTimeout(() => {
+							obj._subscribe();
+						}, 5000);
 						return false;
 					}
 
 					obj._subscribe(); // RECONNECTING!
-
 				} else {
-					obj._onStChange({value:0,state:"DISCONNECTED"});
-					if ( !this._stopped ) {
-						console.error(`HTTP Status: ${ev.target.status}.`, 'Breaking loop... Retrying in 5 seconds.');
-						obj._retryTimeout = setTimeout( () => { obj._subscribe() }, 5000);
+					obj._onStChange({ value: 0, state: 'DISCONNECTED' });
+					if (!this._stopped) {
+						console.error(
+							`HTTP Status: ${ev.target.status}.`,
+							'Breaking loop... Retrying in 5 seconds.'
+						);
+						obj._retryTimeout = setTimeout(() => {
+							obj._subscribe();
+						}, 5000);
 					}
 					return false;
 				}
-
 			}
-		}
-
+		};
 
 		/*obj._httpCall.addEventListener("error", function(e) {
 			console.error(e);
 			return false;
 		});*/
 
-
 		if (obj._bindURL != '') {
-
 			// console.info('Binding...')
 
 			const bindCall = this._ajaxReq();
 
-			bindCall.open( 'GET', obj._bindURL, true);
+			bindCall.open('GET', obj._bindURL, true);
 
 			bindCall.onreadystatechange = (bev) => {
-
 				if (bev.target.readyState == 4) {
-
 					if (bev.target.status >= 200 && bev.target.status < 300) {
-
 						// console.info('Binded!')
 
 						// Inject user binding to body
@@ -468,25 +459,18 @@ class NoPollSubscriber {
 						obj._XHR.data = JSON.stringify(tmpObj);
 
 						obj._httpCall.send(obj._XHR.data);
-
 					} else {
 						console.error(`Unbinding...`);
 						obj._httpCall.send(obj._XHR.data);
 					}
 				}
-			}
+			};
 
 			bindCall.send();
-
 		} else {
-
 			obj._httpCall.send(obj._XHR.data);
-
 		}
-
 	}
-
-
 
 	/*_decomposeURL(fullURL) {
 		const obj = this;
@@ -510,8 +494,6 @@ class NoPollSubscriber {
 		obj._urlHash = lnk.hash;
 	}*/
 
-
-
 	/*_composeURL() {
 		const obj = this;
 
@@ -529,10 +511,6 @@ class NoPollSubscriber {
 		return url;
 	}*/
 
-
-
-
-
 	/////////////////////////////////////////////////
 	//////////////////// SETTERS ////////////////////
 
@@ -540,9 +518,10 @@ class NoPollSubscriber {
 		this._XHR = this._setHTTPRequest(stringOrObj);
 	}
 
-	setBindingKeyUrl(urlString) { // Bind connection to user_id (authorization layer).
+	setBindingKeyUrl(urlString) {
+		// Bind connection to user_id (authorization layer).
 
-		if ( typeof urlString !== 'string') {
+		if (typeof urlString !== 'string') {
 			console.error('Bind url should be a string.', 'Binding was not set.');
 			return;
 		}
@@ -550,14 +529,10 @@ class NoPollSubscriber {
 		this._bindURL = urlString;
 	}
 
-	unsetBindingKey() { // Unbind connection from user_id.
+	unsetBindingKey() {
+		// Unbind connection from user_id.
 		this._bindURL = '';
 	}
-
-
-
-
-
 }
 
 export default NoPollSubscriber;

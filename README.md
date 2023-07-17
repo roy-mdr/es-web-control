@@ -1,9 +1,8 @@
-
 ## Install
 
-1. Make sure *src/libs/NoPollSubscriber.js* is [up to date](https://github.com/roy-mdr/es-web-notify/blob/main/client/NoPollSubscriber.js).
+1. Make sure _src/libs/NoPollSubscriber.js_ is [up to date](https://github.com/roy-mdr/es-web-notify/blob/main/client/NoPollSubscriber.js).
 2. `npm run dev`
-2. `npm run build`
+3. `npm run build`
 
 ## To Do
 

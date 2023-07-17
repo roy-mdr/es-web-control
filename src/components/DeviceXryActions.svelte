@@ -1,8 +1,8 @@
 <script>
 	/* imports */
-	import { onMount, onDestroy, createEventDispatcher } from "svelte";
-	import Modal from "./Modal.svelte";
-	import { lastEvent } from "../stores/eventStore.js";
+	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+	import Modal from './Modal.svelte';
+	import { lastEvent } from '../stores/eventStore.js';
 
 	/* props */
 	export let device; // = {}
@@ -15,19 +15,16 @@
 		initRyObjs();
 
 		lastEventUnsubscribe = lastEvent.subscribe((lstEv) => {
-			if (typeof lstEv == "object") {
-				if (
-					lstEv.ep.requested == device.ep ||
-					lstEv.ep.emitted == device.ep
-				) {
+			if (typeof lstEv == 'object') {
+				if (lstEv.ep.requested == device.ep || lstEv.ep.emitted == device.ep) {
 					lastEvent.reset();
 
-					console.log("DeviceXryActions gotEvent:", lstEv);
+					console.log('DeviceXryActions gotEvent:', lstEv);
 
 					if (
-						lstEv.e.type == "read_all" ||
-						lstEv.e.type == "read_one" ||
-						lstEv.e.type == "change"
+						lstEv.e.type == 'read_all' ||
+						lstEv.e.type == 'read_one' ||
+						lstEv.e.type == 'change'
 					) {
 						setRyStatusByResponseObj(lstEv.e.detail);
 					}
@@ -45,15 +42,15 @@
 
 	function closeDevice() {
 		// deviceObj.expanded = true;
-		dispatch("device-close");
+		dispatch('device-close');
 	}
 
 	function sendAction(command) {
 		device.actions.forEach((action) => {
 			if (action.cmd == command) {
-				dispatch("sendAction", {
+				dispatch('sendAction', {
 					device_id: device._id,
-					action: action,
+					action: action
 				});
 			}
 		});
@@ -95,7 +92,7 @@
 	let ryObjects = [];
 
 	function getCurrentState() {
-		sendAction("get_state-all");
+		sendAction('get_state-all');
 	}
 
 	function initRyObjs() {
@@ -103,7 +100,7 @@
 		for (let index = 0; index < relayQuantity; index++) {
 			ryObjects.push({
 				name: `Relay ${index + 1}`,
-				status: -2,
+				status: -2
 			});
 		}
 		ryObjects = ryObjects;
@@ -143,7 +140,7 @@
 
 			default:
 				ryObjects[ryIndex].status = -2;
-				console.error("Invalid relay status");
+				console.error('Invalid relay status');
 				break;
 		}
 
