@@ -26,6 +26,12 @@ body.modal-open {
 	height: 10em;
 }
 
+.square-small {
+	width: 5em;
+	height: 5em;
+	padding: 1em;
+}
+
 .center {
 	display: flex;
 	justify-content: center;
@@ -49,13 +55,18 @@ body.modal-open {
 }
 
 .noselect {
-	-webkit-touch-callout: none; /* iOS Safari */
-	-webkit-user-select: none; /* Safari */
-	-khtml-user-select: none; /* Konqueror HTML */
-	-moz-user-select: none; /* Old versions of Firefox */
-	-ms-user-select: none; /* Internet Explorer/Edge */
-	user-select: none; /* Non-prefixed version, currently
-									supported by Chrome, Edge, Opera and Firefox */
+	/* iOS Safari */
+	-webkit-touch-callout: none;
+	/* Safari */
+	-webkit-user-select: none;
+	/* Konqueror HTML */
+	-khtml-user-select: none;
+	/* Old versions of Firefox */
+	-moz-user-select: none;
+	/* Internet Explorer/Edge */
+	-ms-user-select: none;
+	/* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+	user-select: none;
 }
 
 /*

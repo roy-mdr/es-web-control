@@ -156,6 +156,7 @@
 		letter-spacing: 0.2em;
 		font-weight: bold;
 		color: #666;
+		text-align: center;
 	}
 
 	/* ---------- IMAGE ---------- */

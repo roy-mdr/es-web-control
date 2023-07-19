@@ -80,7 +80,8 @@
 		<button
 			class="btn_more center absolute-down"
 			style="color: #CCC;"
-			on:click={expandDevice(device)}>
+			on:click={expandDevice(device)}
+		>
 			...
 		</button>
 	{/if}
@@ -134,6 +135,7 @@
 		letter-spacing: 0.2em;
 		font-weight: bold;
 		color: #666;
+		text-align: center;
 	}
 
 	/* ---------- IMAGE ---------- */

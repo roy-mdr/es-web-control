@@ -2,6 +2,7 @@
 	/* imports */
 	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import Modal from './Modal.svelte';
+	import SmallToggle from './SmallToggle.svelte';
 	import { lastEvent } from '../stores/eventStore.js';
 
 	/* props */
@@ -98,7 +99,6 @@
 	function initRyObjs() {
 		// Create relay-objects based on the number of relays given in relayQuantity
 		for (let ix = 0; ix < relayQuantity; ix++) {
-
 			const ryId = `ry${ix + 1}`;
 
 			ryObjects.push({
@@ -152,9 +152,18 @@
 </script>
 
 <Modal title={device.name} on:exitModal={closeDevice}>
-	{#each ryObjects as relay, ryIx}
-		<button on:click={() => toggleRelay(ryIx)}>
-			{relay.name} ({relay.status})
-		</button>
-	{/each}
+	<div class="toggle-container">
+		{#each ryObjects as relay, ryIx}
+			<SmallToggle target={relay} on:toggle={() => toggleRelay(ryIx)} />
+		{/each}
+	</div>
 </Modal>
+
+<style>
+	.toggle-container {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+	}
+</style>
